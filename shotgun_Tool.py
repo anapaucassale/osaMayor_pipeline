@@ -66,11 +66,12 @@ def asignName(inputName):
 			codeToUpload = v['code']
 	if (codeToUpload == None):
 		codeToUpload = inputName + "_v001"
+		updateContent(goodID, codeToUpload, inputType)
 	else:
 		codeToUpload = codeToUpload[:len(codeToUpload) - 4] + ('_v%03d' %(int(codeToUpload[len(codeToUpload) - 3:])+ 1))
+		updateContent(goodID, codeToUpload, inputType)
 
-
-def createShot(id, code, taskType):
+def createContent(id, code, taskType):
     data = {
         'project': {"type": "Project","id": id},
         'code': code,
@@ -81,17 +82,41 @@ def createShot(id, code, taskType):
     pprint(result)
     print "The id of the %s is %d." % (result['type'], result['id'])
 
+def updateContent(contentID, code, taskType):
+	data = {
+		'code': code,
+		'description': 'Updating...',
+        'sg_status_list': 'ip'
+	}
+	result = sg.update(taskType, contentID, data)
+    #result = sg.update(taskType, contentID, data)
+    #result = sg.update(taskType, contentID, data)
+    #pprint(result)
+
 def uploadContent(mediaPath, mediaName):
 	print goodID
 	sg.upload('Version', goodID, mediaPath, display_name = mediaName)
+
+
+user_action = raw_input("Type what you want to upload?\n-> Asset\n-> Shot\n").lower()
+inputType = validateType(user_action)
+ID = raw_input("Type in the %s's ID:\n" %inputType)
+goodID = validateID(ID)
+shotgunInfo = validateIDShotgun(goodID)
+checkVersionsSG()
+newName = asignName(raw_input("\nType de NAME to asign to your %s \n" %inputType))
+print codeToUpload
 
 '''
 user_action = raw_input("Type what you want to upload?\n-> Asset\n-> Shot\n").lower()
 inputType = validateType(user_action)
 ID = raw_input("Type in the %s's ID:\n" %inputType)
 goodID = validateID(ID)
-shotgunInfo = validateIDShotgun(goodID)'''
+shotgunInfo = validateIDShotgun(goodID)
+'''
 
+# CREATE NEW ASSET OR SHOT 
+'''
 projectName = raw_input('Type in the name of the project you want to create a shot in:\n')
 projectID = raw_input("Type in %s's ID:\n" %projectName)
 goodID = validateID(projectID)
@@ -99,8 +124,10 @@ user_action = raw_input("Type what you want to create?\n-> Asset\n-> Shot\n").lo
 inputType = validateType(user_action)
 code = raw_input("Type in %s's name:\n" %inputType)
 
+createContent(goodID, code, inputType)
+'''
 
-createShot(goodID, code, inputType)
+
 
 
 '''
