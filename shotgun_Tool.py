@@ -4,6 +4,8 @@ import os.path
 import time
 
 sg = Shotgun('http://upgdl.shotgunstudio.com', 'AP_Script', '5a652f41b496c46d6b968206a5cc6f91e617157020c73c8ca87e5d4b71775051')
+global inputType, goodID
+
 
 def validateType(userInputType):
 	validationType = False
@@ -36,18 +38,28 @@ def validateIDShotgun(validatedID):
 			validatedID = validateID(newID)
 		else:
 			print "The founded %s's name is: %s" %(inputType, shotgunFile['code'])
-			return shotgunFile
 			shotgunVal = True
+			return shotgunFile
 
-def checkVersionsSG(jsonShotgun):
-	sg.find("Version", [["id","is", validatedID]], ['code'])
+def checkVersionsSG():
+	fields = ['id', 'code']
+	filters = [['entity', 'is', {'type': inputType, 'id': goodID}]]
+	#versions = sg.find("Version", [["id","is", validatedID]], ['code'])
+	versions = sg.find("Version", filters, fields)
 
+	print "The versions in this %s are:\n" %inputType
+	for v in versions:
+		print v['code']
+
+#def create
 
 user_action = raw_input("Type what you want to upload?\n-> Asset\n-> Shot\n").lower()
 inputType = validateType(user_action)
 ID = raw_input("Type in the %s's ID:\n" %inputType)
 goodID = validateID(ID)
 shotgunInfo = validateIDShotgun(goodID)
+
+checkVersionsSG()
 
 
 print 'Data correct'
