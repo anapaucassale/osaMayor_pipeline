@@ -2,8 +2,10 @@ import os, sys
 from shotgun_api3 import Shotgun 
 import os.path
 import time
+from pprint import pprint
 
 sg = Shotgun('http://upgdl.shotgunstudio.com', 'AP_Script', '5a652f41b496c46d6b968206a5cc6f91e617157020c73c8ca87e5d4b71775051')
+#sg = Shotgun('http://upgdl.shotgunstudio.com', login = "anapaucassale", password = "APcassale.13")
 global inputType, goodID, savedVersions
 codeToUpload = None
 #colectedVersions = None
@@ -68,15 +70,47 @@ def asignName(inputName):
 		codeToUpload = codeToUpload[:len(codeToUpload) - 4] + ('_v%03d' %(int(codeToUpload[len(codeToUpload) - 3:])+ 1))
 
 
+def createShot(id, code, taskType):
+    data = {
+        'project': {"type": "Project","id": id},
+        'code': code,
+        'description': 'Open on a beautiful field with fuzzy bunnies',
+        'sg_status_list': 'ip'
+    }
+    result = sg.create(taskType, data)
+    pprint(result)
+    print "The id of the %s is %d." % (result['type'], result['id'])
+
+def uploadContent(mediaPath, mediaName):
+	print goodID
+	sg.upload('Version', goodID, mediaPath, display_name = mediaName)
+
+'''
 user_action = raw_input("Type what you want to upload?\n-> Asset\n-> Shot\n").lower()
 inputType = validateType(user_action)
 ID = raw_input("Type in the %s's ID:\n" %inputType)
 goodID = validateID(ID)
-shotgunInfo = validateIDShotgun(goodID)
+shotgunInfo = validateIDShotgun(goodID)'''
 
-checkVersionsSG()
+projectName = raw_input('Type in the name of the project you want to create a shot in:\n')
+projectID = raw_input("Type in %s's ID:\n" %projectName)
+goodID = validateID(projectID)
+user_action = raw_input("Type what you want to create?\n-> Asset\n-> Shot\n").lower()
+inputType = validateType(user_action)
+code = raw_input("Type in %s's name:\n" %inputType)
+
+
+createShot(goodID, code, inputType)
+
+
+'''
+mediaFile = '/Users/anapau/Desktop/IMG_7327.JPG'
+#mediaFile = raw_input("Type in the PATH of media to upload:\n")
+uploadContent(mediaFile, 'AP_v001')'''
+
+'''checkVersionsSG()
 asignName(raw_input("\nType de NAME to asign to your %s \n" %inputType))
-print codeToUpload
+print codeToUpload'''
 
 print 'Data correct'
 time.sleep(5)
