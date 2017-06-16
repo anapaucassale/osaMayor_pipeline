@@ -82,13 +82,13 @@ def createContent(id, code, taskType):
     pprint(result)
     print "The id of the %s is %d." % (result['type'], result['id'])
 
-def createVersion(ID, code, actionID, mediaPath, description):
+def createVersion(inType, ID, code, actionID, mediaPath, description):
 	data = { 'project': {'type': 'Project','id': ID},
          'code': code,
          'description': description,
          #'sg_path_to_movie': mediaPath,
          'sg_status_list': 'rev',
-         'entity': {'type': 'Shot', 'id': actionID}
+         'entity': {'type': inType, 'id': actionID}
          #'sg_task': {'type': 'Task', 'id': task['id']},
          #'user': {'type': 'HumanUser', 'id': 165} 
          }
@@ -142,7 +142,7 @@ deleteContent(inputType, goodID)
 #shotgunInfo = validateIDShotgun(goodID)
 
 # CERATE A NEW VERSION WITHIN A SHOT OR AN ASSET
-
+'''
 projectName = raw_input('Type in the name of the project you want to create a shot in:\n')
 projectID = raw_input("Type in %s's ID:\n" %projectName)
 goodProjectID = validateID(projectID)
@@ -151,12 +151,12 @@ inputType = validateType(user_action)
 ID = raw_input("Type in the %s's ID:\n" %inputType)
 goodID = validateID(ID)
 #shotgunInfo = validateIDShotgun(goodID)
-
 code = raw_input("Type in %s's version name:\n" %inputType)
 mediaFile = '/Users/anapau/Desktop/Leak.mov'
 desc = raw_input("Type in %s's description:\n" %inputType)
-createVersion(goodProjectID, code, goodID, mediaFile, desc)
-
+#uploadContent(goodVersionID, mediaFile)
+createVersion(inputType, goodProjectID, code, goodID, mediaFile, desc)
+'''
 
 
 # CREATE A SHOT OR AN ASSET
