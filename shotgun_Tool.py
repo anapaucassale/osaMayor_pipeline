@@ -5,8 +5,8 @@ import time
 from pprint import pprint
 
 sg = Shotgun('http://upgdl.shotgunstudio.com', 'AP_Script', '5a652f41b496c46d6b968206a5cc6f91e617157020c73c8ca87e5d4b71775051')
-#sg = Shotgun('http://upgdl.shotgunstudio.com', login = "anapaucassale", password = "APcassale.13")
-global inputType, goodID, savedVersions
+#upload_movie: yes
+global inputType, goodID, projectID, goodProjectID, savedVersions
 codeToUpload = None
 #colectedVersions = None
 
@@ -30,7 +30,7 @@ def validateID(userInputID):
 			#validationNum = True
 			return userInputID
 		except:
-			userInputID = raw_input("ERROR - ID must be a number.\nType in the %s's ID:\n" %inputType)
+			userInputID = raw_input("ERROR - ID must be a number.\nType in the correct ID:\n")
 
 def validateIDShotgun(validatedID):
 	shotgunVal = False
@@ -56,7 +56,7 @@ def checkVersionsSG():
 	print "The versions in this %s are:" %inputType
 	for v in versions:
 		#colectedVersions.append(v['code'])
-		print v['code']
+		print 'VERSION: %s y su ID es: %d' % (v['code'], v['id'])
 
 def asignName(inputName):
 	global savedVersions
@@ -82,22 +82,85 @@ def createContent(id, code, taskType):
     pprint(result)
     print "The id of the %s is %d." % (result['type'], result['id'])
 
-def updateContent(contentID, code, taskType):
+def createVersion(ID, code, actionID, mediaPath, description):
+	data = { 'project': {'type': 'Project','id': ID},
+         'code': code,
+         'description': description,
+         #'sg_path_to_movie': mediaPath,
+         'sg_status_list': 'rev',
+         'entity': {'type': 'Shot', 'id': actionID}
+         #'sg_task': {'type': 'Task', 'id': task['id']},
+         #'user': {'type': 'HumanUser', 'id': 165} 
+         }
+	result = sg.create('Version', data)
+	uploadContent(result['id'], mediaPath)
+
+def deleteContent(inpType, inputID):
+	result = sg.delete(inpType, inputID)
+	print 'The %s has been deleted succesfully' %inpType
+
+def updateContent(contentID, code, inputType):
 	data = {
 		'code': code,
 		'description': 'Updating...',
         'sg_status_list': 'ip'
 	}
-	result = sg.update(taskType, contentID, data)
+	result = sg.update(inputType, contentID, data)
     #result = sg.update(taskType, contentID, data)
     #result = sg.update(taskType, contentID, data)
     #pprint(result)
 
-def uploadContent(mediaPath, mediaName):
-	print goodID
-	sg.upload('Version', goodID, mediaPath, display_name = mediaName)
+def uploadContent(ID, mediaPath):
+	#sg.upload('Version', ID, mediaPath, display_name = mediaName)
+	result = sg.upload("Version", ID, mediaPath, field_name = "sg_uploaded_movie", display_name="Latest QT")
+	print 'Uploaded succesfully'
 
 
+# UPLOAD CONTENT
+'''
+user_action = raw_input("Where do you want to upload your video?\n-> Asset\n-> Shot\n").lower()
+inputType = validateType(user_action)
+ID = raw_input("Type in the %s's VERSION ID:\n" %inputType)
+goodID = validateID(ID)
+mediaFile = '/Users/anapau/Desktop/Leak.mov'
+checkVersionsSG()
+versionID = raw_input("Type in the ID of the version where you want to upload your video:\n")
+goodVersionID = validateID(versionID)
+uploadContent(goodVersionID, mediaFile)
+'''
+
+# DELETE CONTENT
+'''
+user_action = raw_input("What do you want to delete?\n-> Asset\n-> Shot\n").lower()
+inputType = validateType(user_action)
+ID = raw_input("Type in the %s's ID:\n" %inputType)
+goodID = validateID(ID)
+
+deleteContent(inputType, goodID)
+'''
+
+#shotgunInfo = validateIDShotgun(goodID)
+
+# CERATE A NEW VERSION WITHIN A SHOT OR AN ASSET
+
+projectName = raw_input('Type in the name of the project you want to create a shot in:\n')
+projectID = raw_input("Type in %s's ID:\n" %projectName)
+goodProjectID = validateID(projectID)
+user_action = raw_input("Where do you wanna create a new version?\n-> Asset\n-> Shot\n").lower()
+inputType = validateType(user_action)
+ID = raw_input("Type in the %s's ID:\n" %inputType)
+goodID = validateID(ID)
+#shotgunInfo = validateIDShotgun(goodID)
+
+code = raw_input("Type in %s's version name:\n" %inputType)
+mediaFile = '/Users/anapau/Desktop/Leak.mov'
+desc = raw_input("Type in %s's description:\n" %inputType)
+createVersion(goodProjectID, code, goodID, mediaFile, desc)
+
+
+
+# CREATE A SHOT OR AN ASSET
+'''
 user_action = raw_input("Type what you want to upload?\n-> Asset\n-> Shot\n").lower()
 inputType = validateType(user_action)
 ID = raw_input("Type in the %s's ID:\n" %inputType)
@@ -106,6 +169,7 @@ shotgunInfo = validateIDShotgun(goodID)
 checkVersionsSG()
 newName = asignName(raw_input("\nType de NAME to asign to your %s \n" %inputType))
 print codeToUpload
+'''
 
 '''
 user_action = raw_input("Type what you want to upload?\n-> Asset\n-> Shot\n").lower()
@@ -126,9 +190,6 @@ code = raw_input("Type in %s's name:\n" %inputType)
 
 createContent(goodID, code, inputType)
 '''
-
-
-
 
 '''
 mediaFile = '/Users/anapau/Desktop/IMG_7327.JPG'
